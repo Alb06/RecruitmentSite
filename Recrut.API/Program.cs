@@ -1,6 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using Recrut.Data;
+using Recrut.Models;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateSlimBuilder(args);
+
+// Configuration de PostgreSQL avec l'injection de dépendances
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql("Host=host.docker.internal;Port=5432;Database=recrutdb;Username=zahagadmin;Password=24rnUZ42")
+);
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -9,20 +17,17 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
-var sampleTodos = new Todo[] {
-    new(1, "Walk the dog"),
-    new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
-    new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
-    new(4, "Clean the bathroom"),
-    new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
-};
+// Tester la connexion en résolvant `AppDbContext` depuis le conteneur de services
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-var todosApi = app.MapGroup("/todos");
-todosApi.MapGet("/", () => sampleTodos);
-todosApi.MapGet("/{id}", (int id) =>
-    sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
-        ? Results.Ok(todo)
-        : Results.NotFound());
+    context.Users.Add(new User { Name = "Alice", Email = "alice@example.com", PasswordHash = "hashed_password" });
+    context.SaveChanges();
+
+    var user = context.Users.FirstOrDefault();
+    Console.WriteLine($"User: {user.Name}, Email: {user.Email}");
+}
 
 app.Run();
 

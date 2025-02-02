@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <PublishAot>true</PublishAot>
+    <!--<PublishAot>true</PublishAot>-->
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Recrut.Business\Recrut.Business.csproj" />
+    <ProjectReference Include="..\Recrut.Data\Recrut.Data.csproj" />
     <ProjectReference Include="..\Recrut.Models\Recrut.Models.csproj" />
     <ProjectReference Include="..\Recrut.Shared\Recrut.Shared.csproj" />
   </ItemGroup>

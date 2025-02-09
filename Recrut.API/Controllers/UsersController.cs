@@ -2,6 +2,7 @@
 using Recrut.API.DTOs;
 using Recrut.Data.Repositories.Interfaces;
 using Recrut.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Recrut.API.Controllers
 {
@@ -16,59 +17,116 @@ namespace Recrut.API.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
+        [HttpGet("byIds")]
+        public async Task<IActionResult> GetUsersByIds([FromQuery] IEnumerable<int> ids)
         {
-            var users = await _userRepository.GetAllAsync();
-            return Ok(users);
+            try
+            {
+                var users = await _userRepository.GetByIdsAsync(ids);
+                return Ok(users);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while retrieving users." });
+            }
         }
 
         [HttpGet("{email}")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
-            var user = await _userRepository.GetUserByEmailAsync(email);
-            if (user == null) return NotFound();
-            return Ok(user);
+            if (!new EmailAddressAttribute().IsValid(email))
+                return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
+
+            try
+            {
+                var user = await _userRepository.GetUserByEmailAsync(email);
+                if (user == null)
+                    return NotFound(new OperationResult { Success = false, Message = "User not found." });
+                return Ok(user);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while retrieving the user." });
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUsers([FromBody] IEnumerable<UserCreateDto> usersDto)
         {
-            await _userRepository.CreateAsync(new List<User> { user });
-            return CreatedAtAction(nameof(GetUserByEmail), new { email = user.Email }, user);
-        }
-
-        //[HttpPost]
-        //public async Task<IActionResult> CreateUsers([FromBody] IEnumerable<User> users)
-        //{
-        //    await _userRepository.CreateAsync(users);
-        //    return CreatedAtAction(nameof(GetAllUsers), null);
-        //}
-
-        [HttpDelete]
-        public async Task<IActionResult> DeleteUsers([FromBody] IEnumerable<User> users)
-        {
-            await _userRepository.DeleteAsync(users);
-            return NoContent();
-        }
-
-        [HttpDelete("{email}")]
-        public async Task<IActionResult> DeleteUser(string email)
-        {
-            var user = await _userRepository.GetUserByEmailAsync(email);
-            if (user == null)
+            foreach (var userDto in usersDto)
             {
-                return NotFound(new OperationResult { Success = false, Message = "Utilisateur non trouvé." });
+                if (!new EmailAddressAttribute().IsValid(userDto.Email))
+                    return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
             }
 
             try
             {
-                await _userRepository.DeleteAsync(new List<User> { user });
-                return NoContent();  // ou: return Ok(new OperationResult { Success = true, Message = "Suppression réussie." });
+                var users = new List<User>();
+                foreach (var dto in usersDto)
+                {
+                    // TODO : Automapper
+                    users.Add(new User { Name = dto.Name, Email = dto.Email, PasswordHash = dto.PasswordHash });
+                }
+
+                await _userRepository.CreateAsync(users);
+                return Ok(new OperationResult { Success = true, Message = "User(s) created successfully." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new OperationResult { Success = false, Message = $"Erreur lors de la suppression : {ex.Message}" });
+                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while creating users." });
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUsers([FromBody] IEnumerable<User> users)
+        {
+            try
+            {
+                await _userRepository.DeleteAsync(users);
+                return Ok(new OperationResult { Success = true, Message = "Deletion successful." });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while deleting users." });
+            }
+        }
+
+        [HttpDelete("byIds")]
+        public async Task<IActionResult> DeleteUserByIds([FromBody] IEnumerable<int> Ids)
+        {
+            if (!Ids.Any() || Ids == null)
+                return BadRequest(new OperationResult { Success = false, Message = "No Id was sent." });
+            try
+            {
+                int rowsAffected = await _userRepository.DeleteByIdsAsync(Ids);
+                if (rowsAffected == 0)
+                    return NotFound(new OperationResult { Success = false, Message = "User(s) not found." });
+
+                return Ok(new OperationResult { Success = true, Message = "Deletion successful." });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while deleting users." });
+            }
+        }
+
+        [HttpDelete("{email}")]
+        public async Task<IActionResult> DeleteUserByEmail(string email)
+        {
+            if (!new EmailAddressAttribute().IsValid(email))
+                return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
+
+            try
+            {
+                int rowsAffected = await _userRepository.DeleteUserByEmailAsync(email);
+                if (rowsAffected == 0)
+                    return NotFound(new OperationResult { Success = false, Message = "User not found." });
+
+                return Ok(new OperationResult { Success = true, Message = "User deletion successful." });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while deleting the user." });
             }
         }
     }

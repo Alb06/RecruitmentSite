@@ -14,5 +14,10 @@ namespace Recrut.Data.Repositories
         {
             return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        public async Task<int> DeleteUserByEmailAsync(string email)
+        {
+            return await _dbSet.Where(u => u.Email == email).ExecuteDeleteAsync();
+        }
     }
 }

@@ -1,10 +1,12 @@
-﻿namespace Recrut.Models
+﻿using Recrut.Models.Interfaces;
+
+namespace Recrut.Models
 {
-    public class User
+    public class User : IEntity
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string PasswordHash { get; set; }
+        public required string Name { get; set; }
+        public required string Email { get; set; }
+        public required string PasswordHash { get; set; }
     }
 }

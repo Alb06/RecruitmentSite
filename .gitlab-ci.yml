@@ -8,6 +8,7 @@ mirror_to_github:
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
     - chmod 600 ~/.ssh/id_ed25519
     - ssh-keyscan github.com >> ~/.ssh/known_hosts
+    - echo -e "Host github.com\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking no" > ~/.ssh/config
     - git remote add mirror ssh://git@github.com:Alb06/RecruitmentSite.git || true
     - git push --mirror mirror
   only:

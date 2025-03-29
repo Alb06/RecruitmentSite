@@ -1,0 +1,11 @@
+mirror_to_github:
+  stage: deploy
+  image: alpine/git
+  script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan github.com >> ~/.ssh/known_hosts
+    - git push --mirror ssh://git@github.com/TON_COMPTE/TON_REPO_GITHUB.git
+  only:
+    - main

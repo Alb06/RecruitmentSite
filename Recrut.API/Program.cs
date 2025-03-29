@@ -1,4 +1,5 @@
 using Recrut.API.Configuration;
+using Recrut.API.Middleware;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -18,6 +19,7 @@ var app = builder.Build();
 // Activation des middlewares
 app.UseSwaggerConfiguration();
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

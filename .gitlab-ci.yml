@@ -1,11 +1,14 @@
 mirror_to_github:
   stage: deploy
-  image: alpine/git
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git openssh
   script:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
     - chmod 600 ~/.ssh/id_ed25519
     - ssh-keyscan github.com >> ~/.ssh/known_hosts
-    - git push --mirror ssh://git@github.com:Alb06/RecruitmentSite.git
+    - git remote add mirror ssh://git@github.com:Alb06/RecruitmentSite.git || true
+    - git push --mirror mirror
   only:
     - main

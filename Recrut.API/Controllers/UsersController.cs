@@ -51,6 +51,10 @@ namespace Recrut.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateUsers([FromBody] IEnumerable<UserCreateDto> usersDto)
         {
             foreach (var userDto in usersDto)
@@ -59,22 +63,16 @@ namespace Recrut.API.Controllers
                     return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
             }
 
-            try
+            // TODO : Automapper
+            var users = usersDto.Select(dto => new User
             {
-                var users = new List<User>();
-                foreach (var dto in usersDto)
-                {
-                    // TODO : Automapper
-                    users.Add(new User { Name = dto.Name, Email = dto.Email, PasswordHash = dto.PasswordHash });
-                }
+                Name = dto.Name,
+                Email = dto.Email,
+                PasswordHash = dto.PasswordHash
+            }).ToList();
 
-                await _userRepository.CreateAsync(users);
-                return Ok(new OperationResult { Success = true, Message = "User(s) created successfully." });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while creating users." });
-            }
+            await _userRepository.CreateAsync(users);
+            return Ok(new OperationResult { Success = true, Message = "User(s) created successfully." });
         }
 
         [HttpDelete]

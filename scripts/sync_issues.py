@@ -30,18 +30,40 @@ while True:
     github_issues.extend(data)
     page += 1
 
-existing_titles = {issue['title'] for issue in github_issues}
+# Build a mapping of GitHub issues by title
+github_issues_map = {issue['title']: issue for issue in github_issues}
 
-# Create GitLab issues on GitHub if they don't already exist
+# Create or update issues on GitHub based on GitLab issues
 for issue in gitlab_issues:
-    if issue['title'] in existing_titles:
-        print(f"Issue already exists, skipping: {issue['title']}")
+    title = issue['title']
+    state = issue['state']  # 'opened' or 'closed'
+    body = f"Imported from GitLab:\n\n{issue['description']}"
+
+    if title in github_issues_map:
+        github_issue = github_issues_map[title]
+        gh_number = github_issue['number']
+        needs_state_update = (
+            (state == 'closed' and github_issue['state'] != 'closed') or
+            (state == 'opened' and github_issue['state'] != 'open')
+        )
+        if needs_state_update:
+            update_payload = {"state": "closed" if state == "closed" else "open"}
+            response = requests.patch(
+                f'https://api.github.com/repos/{GITHUB_REPO}/issues/{gh_number}',
+                headers=headers_github,
+                json=update_payload
+            )
+            print(f"Updated state of issue: {title} → {update_payload['state']}")
+        else:
+            print(f"Issue already up-to-date: {title}")
         continue
 
+    # Create new issue if it doesn't exist
     payload = {
-        'title': issue['title'],
-        'body': f"Imported from GitLab:\n\n{issue['description']}",
-        'labels': ['imported-from-gitlab']
+        'title': title,
+        'body': body,
+        'labels': ['imported-from-gitlab'],
+        'state': 'closed' if state == 'closed' else 'open'
     }
     response = requests.post(
         f'https://api.github.com/repos/{GITHUB_REPO}/issues',
@@ -49,7 +71,6 @@ for issue in gitlab_issues:
         json=payload
     )
     if response.status_code == 201:
-        print(f"Issue created: {issue['title']}")
+        print(f"Issue created: {title} (state: {payload['state']})")
     else:
-        print(f"Failed to create issue: {issue['title']} → {response.status_code} → {response.text}")
-
+        print(f"Failed to create issue: {title} → {response.status_code} → {response.text}")

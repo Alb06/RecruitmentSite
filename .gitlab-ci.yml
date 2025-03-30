@@ -16,3 +16,14 @@ mirror_to_github:
     - git push --mirror mirror
   only:
     - main
+
+
+sync_issues_to_github:
+  stage: deploy
+  image: python:3.11
+  before_script:
+    - pip install requests
+  script:
+    - python scripts/sync_issues.py
+  only:
+    - main

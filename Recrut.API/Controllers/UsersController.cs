@@ -20,15 +20,12 @@ namespace Recrut.API.Controllers
         [HttpGet("byIds")]
         public async Task<IActionResult> GetUsersByIds([FromQuery] IEnumerable<int> ids)
         {
-            try
-            {
-                var users = await _userRepository.GetByIdsAsync(ids);
-                return Ok(users);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while retrieving users." });
-            }
+            var users = await _userRepository.GetByIdsAsync(ids);
+            
+            if (users == null || !users.Any())
+                return NotFound(new OperationResult { Success = false, Message = "User(s) not found." });
+            
+            return Ok(users);
         }
 
         [HttpGet("{email}")]
@@ -37,17 +34,11 @@ namespace Recrut.API.Controllers
             if (!new EmailAddressAttribute().IsValid(email))
                 return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
 
-            try
-            {
-                var user = await _userRepository.GetUserByEmailAsync(email);
-                if (user == null)
-                    return NotFound(new OperationResult { Success = false, Message = "User not found." });
-                return Ok(user);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while retrieving the user." });
-            }
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if (user == null)
+                return NotFound(new OperationResult { Success = false, Message = "User not found." });
+
+            return Ok(user);
         }
 
         [HttpPost]
@@ -78,34 +69,21 @@ namespace Recrut.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteUsers([FromBody] IEnumerable<User> users)
         {
-            try
-            {
-                await _userRepository.DeleteAsync(users);
-                return Ok(new OperationResult { Success = true, Message = "Deletion successful." });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while deleting users." });
-            }
+            await _userRepository.DeleteAsync(users);
+            return Ok(new OperationResult { Success = true, Message = "Deletion successful." });
         }
 
         [HttpDelete("byIds")]
-        public async Task<IActionResult> DeleteUserByIds([FromBody] IEnumerable<int> Ids)
+        public async Task<IActionResult> DeleteUserByIds([FromBody] IEnumerable<int> ids)
         {
-            if (!Ids.Any() || Ids == null)
+            if (ids == null || !ids.Any())
                 return BadRequest(new OperationResult { Success = false, Message = "No Id was sent." });
-            try
-            {
-                int rowsAffected = await _userRepository.DeleteByIdsAsync(Ids);
-                if (rowsAffected == 0)
-                    return NotFound(new OperationResult { Success = false, Message = "User(s) not found." });
 
-                return Ok(new OperationResult { Success = true, Message = "Deletion successful." });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while deleting users." });
-            }
+            int rowsAffected = await _userRepository.DeleteByIdsAsync(ids);
+            if (rowsAffected == 0)
+                return NotFound(new OperationResult { Success = false, Message = "User(s) not found." });
+
+            return Ok(new OperationResult { Success = true, Message = "Deletion successful." });
         }
 
         [HttpDelete("{email}")]
@@ -114,18 +92,11 @@ namespace Recrut.API.Controllers
             if (!new EmailAddressAttribute().IsValid(email))
                 return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
 
-            try
-            {
-                int rowsAffected = await _userRepository.DeleteUserByEmailAsync(email);
-                if (rowsAffected == 0)
-                    return NotFound(new OperationResult { Success = false, Message = "User not found." });
+            int rowsAffected = await _userRepository.DeleteUserByEmailAsync(email);
+            if (rowsAffected == 0)
+                return NotFound(new OperationResult { Success = false, Message = "User not found." });
 
-                return Ok(new OperationResult { Success = true, Message = "User deletion successful." });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new OperationResult { Success = false, Message = "An error occurred while deleting the user." });
-            }
+            return Ok(new OperationResult { Success = true, Message = "User deletion successful." });
         }
     }
 }

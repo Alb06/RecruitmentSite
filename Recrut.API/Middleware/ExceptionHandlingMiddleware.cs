@@ -36,7 +36,7 @@ namespace Recrut.API.Middleware
             context.Response.ContentType = "application/json";
             var response = context.Response;
 
-            string message = "Une erreur s'est produite.";
+            string message = "An error has occurred.";
             response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
             switch (exception)
@@ -44,11 +44,11 @@ namespace Recrut.API.Middleware
                 case DbUpdateException dbUpdateEx when dbUpdateEx.InnerException is PostgresException pgEx && pgEx.SqlState == ((int)PGEnums.Execeptions.UniqueViolation).ToString():
                     response.StatusCode = (int)HttpStatusCode.Conflict;
                     message = IdentifyUniqueConstraintViolation(pgEx);
-                    _logger.LogError(exception, $"Violation de contrainte d'unicité détectée - {pgEx.ConstraintName}.");
+                    _logger.LogError(exception, $"Uniqueness constraint violation detected - {pgEx.ConstraintName}.");
                     break;
 
                 default:
-                    _logger.LogError(exception, "Exception non gérée détectée.");
+                    _logger.LogError(exception, "Unhandled exception detected.");
                     break;
             }
 
@@ -66,11 +66,11 @@ namespace Recrut.API.Middleware
             switch (pgEx.ConstraintName)
             {
                 case string constraintName when constraintName.Contains(nameof(User.Name)):
-                    return "Le nom est déjà utilisé.";
+                    return "The name is already in use.";
                 case string constraintName when constraintName.Contains(nameof(User.Email)):
-                    return "L'adresse email est déjà utilisée.";
+                    return "The email address is already in use.";
                 default:
-                    return "Une contrainte d'unicité a été violée.";
+                    return "A uniqueness constraint was violated.";
             }
         }
     }

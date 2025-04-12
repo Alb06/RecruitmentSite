@@ -18,7 +18,7 @@ namespace Recrut.API.Controllers
     /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -147,7 +147,7 @@ namespace Recrut.API.Controllers
         /// <response code="404">If the user is not found</response>
         /// <response code="409">If a conflict exists (e.g. email already used)</response>
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]

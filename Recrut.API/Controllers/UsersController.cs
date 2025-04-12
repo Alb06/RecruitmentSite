@@ -54,6 +54,10 @@ namespace Recrut.API.Controllers
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUsersByIds([FromQuery] IEnumerable<int> ids)
         {
+            var validationResult = ValidateIds(ids);
+            if (validationResult != null)
+                return validationResult;
+
             var users = await _userRepository.GetByIdsAsync(ids);
 
             if (users == null || !users.Any())
@@ -78,8 +82,9 @@ namespace Recrut.API.Controllers
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
-            if (!new EmailAddressAttribute().IsValid(email))
-                return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
+            var validationResult = ValidateEmail(email);
+            if (validationResult != null)
+                return validationResult;
 
             var user = await _userRepository.GetUserByEmailAsync(email);
             if (user == null)
@@ -112,8 +117,9 @@ namespace Recrut.API.Controllers
         {
             foreach (var userDto in usersDto)
             {
-                if (!new EmailAddressAttribute().IsValid(userDto.Email))
-                    return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
+                var validationResult = ValidateEmail(userDto.Email);
+                if (validationResult != null)
+                    return validationResult;
             }
 
             var users = _mapper.Map<IEnumerable<User>>(usersDto).ToList();
@@ -148,12 +154,16 @@ namespace Recrut.API.Controllers
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto userDto)
         {
-            if (userDto.Email != null && !new EmailAddressAttribute().IsValid(userDto.Email))
-                return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
+            if (userDto.Email != null)
+            {
+                var emailValidationResult = ValidateEmail(userDto.Email);
+                if (emailValidationResult != null)
+                    return emailValidationResult;
+            }
 
-            var existingUser = await _userRepository.GetByIdAsync(id);
-            if (existingUser == null)
-                return NotFound(new OperationResult { Success = false, Message = "User not found." });
+            var (userValidationResult, existingUser) = await GetAndValidateUserAsync(id);
+            if (userValidationResult != null)
+                return userValidationResult;
 
             _mapper.Map(userDto, existingUser);
 
@@ -206,8 +216,9 @@ namespace Recrut.API.Controllers
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUserByIds([FromBody] IEnumerable<int> ids)
         {
-            if (ids == null || !ids.Any())
-                return BadRequest(new OperationResult { Success = false, Message = "No Id was sent." });
+            var validationResult = ValidateIds(ids);
+            if (validationResult != null)
+                return validationResult;
 
             int rowsAffected = await _userRepository.DeleteByIdsAsync(ids);
             if (rowsAffected == 0)
@@ -234,8 +245,9 @@ namespace Recrut.API.Controllers
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUserByEmail(string email)
         {
-            if (!new EmailAddressAttribute().IsValid(email))
-                return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
+            var validationResult = ValidateEmail(email);
+            if (validationResult != null)
+                return validationResult;
 
             int rowsAffected = await _userRepository.DeleteUserByEmailAsync(email);
             if (rowsAffected == 0)
@@ -243,5 +255,49 @@ namespace Recrut.API.Controllers
 
             return Ok(new OperationResult { Success = true, Message = "User deletion successful." });
         }
+
+        #region Validation Methods
+
+        /// <summary>
+        /// Validates an email address format
+        /// </summary>
+        /// <param name="email">Email to validate</param>
+        /// <returns>BadRequest result if invalid, null if valid</returns>
+        private IActionResult ValidateEmail(string email)
+        {
+            if (!new EmailAddressAttribute().IsValid(email))
+                return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
+
+            return null;
+        }
+
+        /// <summary>
+        /// Validates that the collection of IDs is not null or empty
+        /// </summary>
+        /// <param name="ids">Collection of IDs to validate</param>
+        /// <returns>BadRequest result if invalid, null if valid</returns>
+        private IActionResult ValidateIds(IEnumerable<int> ids)
+        {
+            if (ids == null || !ids.Any())
+                return BadRequest(new OperationResult { Success = false, Message = "No Id was sent." });
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets and validates that a user exists by ID
+        /// </summary>
+        /// <param name="id">User ID to check</param>
+        /// <returns>Tuple with validation result and user (if found)</returns>
+        private async Task<(IActionResult ValidationResult, User User)> GetAndValidateUserAsync(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+                return (NotFound(new OperationResult { Success = false, Message = "User not found." }), null);
+
+            return (null, user);
+        }
+
+        #endregion
     }
 }

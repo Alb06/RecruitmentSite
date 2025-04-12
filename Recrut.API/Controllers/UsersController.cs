@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Recrut.API.DTOs;
 using Recrut.Business.Services.Interfaces;
@@ -13,13 +14,17 @@ namespace Recrut.API.Controllers
     [Authorize]
     public class UsersController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IUserRepository _userRepository;
 
         public UsersController(
+            IMapper mapper,
             IPasswordHasher passwordHasher,
-            IUserRepository userRepository)
+            IUserRepository userRepository
+            )
         {
+            _mapper = mapper;
             _passwordHasher = passwordHasher;
             _userRepository = userRepository;
         }
@@ -31,8 +36,10 @@ namespace Recrut.API.Controllers
             
             if (users == null || !users.Any())
                 return NotFound(new OperationResult { Success = false, Message = "User(s) not found." });
-            
-            return Ok(users);
+
+            var usersDto = _mapper.Map<IEnumerable<UserResponseDto>>(users);
+
+            return Ok(usersDto);
         }
 
         [HttpGet("{email}")]
@@ -45,7 +52,8 @@ namespace Recrut.API.Controllers
             if (user == null)
                 return NotFound(new OperationResult { Success = false, Message = "User not found." });
 
-            return Ok(user);
+            var userDto = _mapper.Map<UserResponseDto>(user);
+            return Ok(userDto);
         }
 
         [HttpPost("createUsers")]
@@ -62,16 +70,36 @@ namespace Recrut.API.Controllers
                     return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
             }
 
-            // TODO : Automapper
-            var users = usersDto.Select(dto => new User
+            var users = _mapper.Map<IEnumerable<User>>(usersDto).ToList();
+            foreach (var user in users)
             {
-                Name = dto.Name,
-                Email = dto.Email,
-                PasswordHash = _passwordHasher.HashPassword(dto.PasswordHash)
-            }).ToList();
+                user.PasswordHash = _passwordHasher.HashPassword(user.PasswordHash);
+            }
 
             await _userRepository.CreateAsync(users);
             return Ok(new OperationResult { Success = true, Message = "User(s) created successfully." });
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto userDto)
+        {
+            if (userDto.Email != null && !new EmailAddressAttribute().IsValid(userDto.Email))
+                return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
+
+            var existingUser = await _userRepository.GetByIdAsync(id);
+            if (existingUser == null)
+                return NotFound(new OperationResult { Success = false, Message = "User not found." });
+
+            _mapper.Map(userDto, existingUser);
+
+            if (!string.IsNullOrEmpty(userDto.PasswordHash))
+            {
+                existingUser.PasswordHash = _passwordHasher.HashPassword(userDto.PasswordHash);
+            }
+
+            await _userRepository.UpdateAsync(existingUser);
+            return Ok(new OperationResult { Success = true, Message = "User updated successfully." });
         }
 
         [HttpDelete]

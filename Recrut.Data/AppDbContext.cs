@@ -20,6 +20,17 @@ namespace Recrut.Data
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            // Configuration de la relation many-to-many
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Roles)
+                .WithMany(r => r.Users)
+                .UsingEntity(j => j.ToTable("UserRoles"));
+
+            // Seed des rôles par défaut
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, Name = "Admin" },
+                new Role { Id = 2, Name = "User" });
         }
     }
 }

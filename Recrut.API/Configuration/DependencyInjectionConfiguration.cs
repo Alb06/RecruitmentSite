@@ -1,5 +1,7 @@
 ﻿using Recrut.Data.Repositories.Interfaces;
 using Recrut.Data.Repositories;
+using Recrut.Business.Services.Interfaces;
+using Recrut.Business.Services;
 
 namespace Recrut.API.Configuration
 {
@@ -7,8 +9,14 @@ namespace Recrut.API.Configuration
     {
         public static void AddDependencyInjectionConfiguration(this IServiceCollection services)
         {
+            // repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserAuthRepository, UserAuthRepository>();
+
+            // Services
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IAuthService, AuthService>();
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Recrut.API.DTOs;
+using Recrut.Business.Services.Interfaces;
 using Recrut.Data.Repositories.Interfaces;
 using Recrut.Models;
 using System.ComponentModel.DataAnnotations;
@@ -8,12 +10,17 @@ namespace Recrut.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
+        private readonly IPasswordHasher _passwordHasher;
         private readonly IUserRepository _userRepository;
 
-        public UsersController(IUserRepository userRepository)
+        public UsersController(
+            IPasswordHasher passwordHasher,
+            IUserRepository userRepository)
         {
+            _passwordHasher = passwordHasher;
             _userRepository = userRepository;
         }
 
@@ -41,7 +48,8 @@ namespace Recrut.API.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
+        [HttpPost("createUsers")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status409Conflict)]
@@ -59,7 +67,7 @@ namespace Recrut.API.Controllers
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                PasswordHash = dto.PasswordHash
+                PasswordHash = _passwordHasher.HashPassword(dto.PasswordHash)
             }).ToList();
 
             await _userRepository.CreateAsync(users);
@@ -67,6 +75,7 @@ namespace Recrut.API.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUsers([FromBody] IEnumerable<User> users)
         {
             await _userRepository.DeleteAsync(users);
@@ -74,6 +83,7 @@ namespace Recrut.API.Controllers
         }
 
         [HttpDelete("byIds")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUserByIds([FromBody] IEnumerable<int> ids)
         {
             if (ids == null || !ids.Any())
@@ -87,6 +97,7 @@ namespace Recrut.API.Controllers
         }
 
         [HttpDelete("{email}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUserByEmail(string email)
         {
             if (!new EmailAddressAttribute().IsValid(email))

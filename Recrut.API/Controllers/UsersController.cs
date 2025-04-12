@@ -9,6 +9,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Recrut.API.Controllers
 {
+    /// <summary>
+    /// User management controller
+    /// </summary>
+    /// <remarks>
+    /// This controller exposes CRUD operations for user management.
+    /// Some methods are restricted to administrators.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -18,22 +25,37 @@ namespace Recrut.API.Controllers
         private readonly IPasswordHasher _passwordHasher;
         private readonly IUserRepository _userRepository;
 
+        /// <summary>
+        /// Initializes a new instance of the UsersController
+        /// </summary>
+        /// <param name="mapper">Mapping service between entities and DTOs</param>
+        /// <param name="passwordHasher">Password hashing service</param>
+        /// <param name="userRepository">Repository for user data access</param>
         public UsersController(
             IMapper mapper,
             IPasswordHasher passwordHasher,
             IUserRepository userRepository
-            )
+        )
         {
             _mapper = mapper;
             _passwordHasher = passwordHasher;
             _userRepository = userRepository;
         }
 
+        /// <summary>
+        /// Retrieves users by their specified IDs
+        /// </summary>
+        /// <param name="ids">List of user IDs to retrieve</param>
+        /// <returns>List of found users</returns>
+        /// <response code="200">Returns the list of found users</response>
+        /// <response code="404">If no user is found for the specified IDs</response>
         [HttpGet("byIds")]
+        [ProducesResponseType(typeof(IEnumerable<UserResponseDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUsersByIds([FromQuery] IEnumerable<int> ids)
         {
             var users = await _userRepository.GetByIdsAsync(ids);
-            
+
             if (users == null || !users.Any())
                 return NotFound(new OperationResult { Success = false, Message = "User(s) not found." });
 
@@ -42,7 +64,18 @@ namespace Recrut.API.Controllers
             return Ok(usersDto);
         }
 
+        /// <summary>
+        /// Retrieves a user by their email address
+        /// </summary>
+        /// <param name="email">The email address of the user to retrieve</param>
+        /// <returns>The found user or 404 error if not found</returns>
+        /// <response code="200">Returns the requested user</response>
+        /// <response code="400">If the email format is invalid</response>
+        /// <response code="404">If the user is not found</response>
         [HttpGet("{email}")]
+        [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
             if (!new EmailAddressAttribute().IsValid(email))
@@ -56,6 +89,19 @@ namespace Recrut.API.Controllers
             return Ok(userDto);
         }
 
+        /// <summary>
+        /// Creates multiple users
+        /// </summary>
+        /// <param name="usersDto">User data to be created</param>
+        /// <returns>Operation result</returns>
+        /// <remarks>
+        /// This operation is restricted to administrators.
+        /// Passwords are automatically hashed before being stored.
+        /// </remarks>
+        /// <response code="200">If users were created successfully</response>
+        /// <response code="400">If the data is invalid</response>
+        /// <response code="409">If a conflict exists (e.g. email already used)</response>
+        /// <response code="500">In case of an internal server error</response>
         [HttpPost("createUsers")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
@@ -80,8 +126,26 @@ namespace Recrut.API.Controllers
             return Ok(new OperationResult { Success = true, Message = "User(s) created successfully." });
         }
 
+        /// <summary>
+        /// Updates an existing user
+        /// </summary>
+        /// <param name="id">ID of the user to update</param>
+        /// <param name="userDto">New user data</param>
+        /// <returns>Operation result</returns>
+        /// <remarks>
+        /// This operation is restricted to administrators.
+        /// The password is automatically hashed if provided.
+        /// </remarks>
+        /// <response code="200">If the user was successfully updated</response>
+        /// <response code="400">If the data is invalid</response>
+        /// <response code="404">If the user is not found</response>
+        /// <response code="409">If a conflict exists (e.g. email already used)</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto userDto)
         {
             if (userDto.Email != null && !new EmailAddressAttribute().IsValid(userDto.Email))
@@ -102,16 +166,44 @@ namespace Recrut.API.Controllers
             return Ok(new OperationResult { Success = true, Message = "User updated successfully." });
         }
 
+        /// <summary>
+        /// Deletes multiple users
+        /// </summary>
+        /// <param name="users">List of users to delete</param>
+        /// <returns>Operation result</returns>
+        /// <remarks>
+        /// This operation is restricted to administrators.
+        /// </remarks>
+        /// <response code="200">If users were deleted successfully</response>
+        /// <response code="401">If the user is not authenticated</response>
+        /// <response code="403">If the user does not have the required permissions</response>
         [HttpDelete]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> DeleteUsers([FromBody] IEnumerable<User> users)
         {
             await _userRepository.DeleteAsync(users);
             return Ok(new OperationResult { Success = true, Message = "Deletion successful." });
         }
 
+        /// <summary>
+        /// Deletes users by their IDs
+        /// </summary>
+        /// <param name="ids">List of user IDs to delete</param>
+        /// <returns>Operation result</returns>
+        /// <remarks>
+        /// This operation is restricted to administrators.
+        /// </remarks>
+        /// <response code="200">If users were deleted successfully</response>
+        /// <response code="400">If no ID is provided</response>
+        /// <response code="404">If no user is found for the specified IDs</response>
         [HttpDelete("byIds")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUserByIds([FromBody] IEnumerable<int> ids)
         {
             if (ids == null || !ids.Any())
@@ -124,8 +216,22 @@ namespace Recrut.API.Controllers
             return Ok(new OperationResult { Success = true, Message = "Deletion successful." });
         }
 
+        /// <summary>
+        /// Deletes a user by their email address
+        /// </summary>
+        /// <param name="email">Email address of the user to delete</param>
+        /// <returns>Operation result</returns>
+        /// <remarks>
+        /// This operation is restricted to administrators.
+        /// </remarks>
+        /// <response code="200">If the user was deleted successfully</response>
+        /// <response code="400">If the email format is invalid</response>
+        /// <response code="404">If the user is not found</response>
         [HttpDelete("{email}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUserByEmail(string email)
         {
             if (!new EmailAddressAttribute().IsValid(email))

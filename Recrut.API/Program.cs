@@ -15,6 +15,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 builder.Services.AddDependencyInjectionConfiguration();
 builder.Services.AddSwaggerConfiguration();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Configuration JWT
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));

@@ -20,9 +20,17 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5E4730EB-0BCC-4B33-BD5A-BEA9CBB1B746}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		.runsettings = .runsettings
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recrut.Data", "Recrut.Data\Recrut.Data.csproj", "{362256B2-8B48-4014-842F-A664A694F754}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{D812B649-7D9F-47A5-B46C-8E2F44C8EA24}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\sync_issues.py = scripts\sync_issues.py
+		scripts\run-coverage.sh = scripts\run-coverage.sh
+		scripts\Run-Coverage.ps1 = scripts\Run-Coverage.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -15,22 +15,26 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "recrut.appliweb.client", "R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recrut.Shared", "Recrut.Shared\Recrut.Shared.csproj", "{FEE2C9E0-37F8-4AEE-9470-B2A900D1924B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recrut.Tests", "Recrut.Tests\Recrut.Tests.csproj", "{7EDF0CEC-75B8-4986-A797-DAB783AAE29C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recrut.TestU", "Recrut.Tests\Recrut.TestU.csproj", "{7EDF0CEC-75B8-4986-A797-DAB783AAE29C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5E4730EB-0BCC-4B33-BD5A-BEA9CBB1B746}"
 	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
 		.runsettings = .runsettings
+		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recrut.Data", "Recrut.Data\Recrut.Data.csproj", "{362256B2-8B48-4014-842F-A664A694F754}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{D812B649-7D9F-47A5-B46C-8E2F44C8EA24}"
 	ProjectSection(SolutionItems) = preProject
-		scripts\sync_issues.py = scripts\sync_issues.py
-		scripts\run-coverage.sh = scripts\run-coverage.sh
 		scripts\Run-Coverage.ps1 = scripts\Run-Coverage.ps1
+		scripts\run-coverage.sh = scripts\run-coverage.sh
+		scripts\sync_issues.py = scripts\sync_issues.py
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recrut.API.IntegrationTests", "Recrut.TestIntegration\Recrut.API.IntegrationTests.csproj", "{D5B39B36-8E82-435F-9AA0-743C5BA822EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{08307455-0FA4-4A18-9242-56D5B3769D06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,8 +76,16 @@ Global
 		{362256B2-8B48-4014-842F-A664A694F754}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{362256B2-8B48-4014-842F-A664A694F754}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{362256B2-8B48-4014-842F-A664A694F754}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5B39B36-8E82-435F-9AA0-743C5BA822EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5B39B36-8E82-435F-9AA0-743C5BA822EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5B39B36-8E82-435F-9AA0-743C5BA822EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5B39B36-8E82-435F-9AA0-743C5BA822EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7EDF0CEC-75B8-4986-A797-DAB783AAE29C} = {08307455-0FA4-4A18-9242-56D5B3769D06}
+		{D5B39B36-8E82-435F-9AA0-743C5BA822EE} = {08307455-0FA4-4A18-9242-56D5B3769D06}
 	EndGlobalSection
 EndGlobal

@@ -9,10 +9,7 @@ namespace Recrut.API.IntegrationTests.Controllers
     public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         private readonly HttpClient _client;
-        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
+        private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public AuthControllerTests(CustomWebApplicationFactory<Program> factory)
         {
@@ -92,7 +89,7 @@ namespace Recrut.API.IntegrationTests.Controllers
             {
                 // Email manquant
                 Password = "Password123!",
-                Email = null
+                Email = "not-an-email"
             };
 
             // Act

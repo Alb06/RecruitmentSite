@@ -7,7 +7,7 @@ using Recrut.Models;
 using Recrut.Shared.Authentication;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Recrut.Tests.Services
+namespace Recrut.TestU.Services
 {
     /// <summary>
     /// Tests unitaires pour le service AuthService
@@ -55,7 +55,7 @@ namespace Recrut.Tests.Services
                 Email = email,
                 Name = "Unit Test User",
                 PasswordHash = "hashed_password",
-                Roles = new List<Role> { new Role { Id = testUserId, Name = "User" } }
+                Roles = [new Role { Id = testUserId, Name = "User" }]
             };
 
             _mockUserAuthRepository.Setup(repo => repo.GetUserByEmailWithRolesAsync(email))
@@ -64,25 +64,25 @@ namespace Recrut.Tests.Services
                 .Returns(true);
 
             // Act
-            var result = await _authService.AuthenticateAsync(email, password);
+            var (success, token) = await _authService.AuthenticateAsync(email, password);
 
             // Assert
-            Assert.True(result.Success);
-            Assert.NotEmpty(result.Token);
+            Assert.True(success);
+            Assert.NotEmpty(token);
 
             // Vérification basique du format JWT (commence par eyJ)
-            Assert.StartsWith("eyJ", result.Token);
+            Assert.StartsWith("eyJ", token);
 
             // Vérification plus avancée avec JwtSecurityTokenHandler
             var tokenHandler = new JwtSecurityTokenHandler();
-            Assert.True(tokenHandler.CanReadToken(result.Token));
+            Assert.True(tokenHandler.CanReadToken(token));
 
-            var token = tokenHandler.ReadJwtToken(result.Token);
-            Assert.Equal(_jwtOptions.Issuer, token.Issuer);
-            Assert.Equal(_jwtOptions.Audience, token.Audiences.First());
-            Assert.Equal(user.Id.ToString(), token.Subject);
-            Assert.Equal(user.Email, token.Claims.First(c => c.Type == JwtRegisteredClaimNames.Email).Value);
-            Assert.Contains(token.Claims, c => c.Type == System.Security.Claims.ClaimTypes.Role && c.Value == "User");
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            Assert.Equal(_jwtOptions.Issuer, jwtToken.Issuer);
+            Assert.Equal(_jwtOptions.Audience, jwtToken.Audiences.First());
+            Assert.Equal(user.Id.ToString(), jwtToken.Subject);
+            Assert.Equal(user.Email, jwtToken.Claims.First(c => c.Type == JwtRegisteredClaimNames.Email).Value);
+            Assert.Contains(jwtToken.Claims, c => c.Type == System.Security.Claims.ClaimTypes.Role && c.Value == "User");
         }
 
         [Fact]
@@ -93,14 +93,14 @@ namespace Recrut.Tests.Services
             var password = "password";
 
             _mockUserAuthRepository.Setup(repo => repo.GetUserByEmailWithRolesAsync(email))
-                .ReturnsAsync((User)null);
+                .ReturnsAsync((User?)null);
 
             // Act
-            var result = await _authService.AuthenticateAsync(email, password);
+            var (success, token) = await _authService.AuthenticateAsync(email, password);
 
             // Assert
-            Assert.False(result.Success);
-            Assert.Empty(result.Token);
+            Assert.False(success);
+            Assert.Empty(token);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace Recrut.Tests.Services
                 Name = "Test User",
                 Email = email,
                 PasswordHash = "hashed_password",
-                Roles = new List<Role> { new Role { Id = testUserId, Name = "User" } }
+                Roles = [new Role { Id = testUserId, Name = "User" }]
             };
 
             _mockUserAuthRepository.Setup(repo => repo.GetUserByEmailWithRolesAsync(email))
@@ -124,11 +124,11 @@ namespace Recrut.Tests.Services
                 .Returns(false);
 
             // Act
-            var result = await _authService.AuthenticateAsync(email, password);
+            var (success, token) = await _authService.AuthenticateAsync(email, password);
 
             // Assert
-            Assert.False(result.Success);
-            Assert.Empty(result.Token);
+            Assert.False(success);
+            Assert.Empty(token);
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace Recrut.Tests.Services
             string roleName = "Admin";
 
             _mockUserAuthRepository.Setup(repo => repo.GetUserRoleNamesAsync(userId))
-                .ReturnsAsync(new List<string> { "User", "Admin" });
+                .ReturnsAsync(["User", "Admin"]);
 
             // Act
             var result = await _authService.IsInRoleAsync(userId, roleName);
@@ -156,7 +156,7 @@ namespace Recrut.Tests.Services
             string roleName = "SuperAdmin";
 
             _mockUserAuthRepository.Setup(repo => repo.GetUserRoleNamesAsync(userId))
-                .ReturnsAsync(new List<string> { "User", "Admin" });
+                .ReturnsAsync(["User", "Admin"]);
 
             // Act
             var result = await _authService.IsInRoleAsync(userId, roleName);
@@ -173,7 +173,7 @@ namespace Recrut.Tests.Services
             string roleName = "Admin";
 
             _mockUserAuthRepository.Setup(repo => repo.GetUserRoleNamesAsync(userId))
-                .ReturnsAsync(Enumerable.Empty<string>());
+                .ReturnsAsync([]);
 
             // Act
             var result = await _authService.IsInRoleAsync(userId, roleName);
@@ -206,7 +206,7 @@ namespace Recrut.Tests.Services
             int userId = testUserId;
 
             _mockUserAuthRepository.Setup(repo => repo.GetUserRoleNamesAsync(userId))
-                .ReturnsAsync(new List<string>());
+                .ReturnsAsync([]);
 
             // Act
             var result = await _authService.GetUserRolesAsync(userId);
@@ -222,7 +222,7 @@ namespace Recrut.Tests.Services
             int userId = testUserNotFoundId;
 
             _mockUserAuthRepository.Setup(repo => repo.GetUserRoleNamesAsync(userId))
-                .ReturnsAsync(Enumerable.Empty<string>());
+                .ReturnsAsync([]);
 
             // Act
             var result = await _authService.GetUserRolesAsync(userId);

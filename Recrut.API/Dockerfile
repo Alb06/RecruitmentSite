@@ -44,5 +44,8 @@ USER app
 FROM ${FINAL_BASE_IMAGE:-mcr.microsoft.com/dotnet/runtime-deps:8.0} AS final
 WORKDIR /app
 EXPOSE 8080
+RUN mkdir -p /app/keys && chmod 700 /app/keys
+RUN mkdir -p /app/certificates
+COPY ["certificates/dataprotection.pfx", "/app/certificates/"]
 COPY --from=publish /app/publish .
-ENTRYPOINT ["./Recrut.API"]
+ENTRYPOINT ["dotnet", "Recrut.API.dll"]

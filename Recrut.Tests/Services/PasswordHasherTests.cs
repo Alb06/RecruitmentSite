@@ -1,6 +1,6 @@
 ﻿using Recrut.Business.Services;
 
-namespace Recrut.Tests.Services
+namespace Recrut.TestU.Services
 {
     /// <summary>
     /// Tests unitaires pour le service PasswordHasher

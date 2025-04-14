@@ -1,7 +1,7 @@
 ﻿using Recrut.Data.Repositories;
 using Recrut.Models;
 
-namespace Recrut.Tests.Repositories
+namespace Recrut.TestU.Repositories
 {
     public class UserAuthRepositoryTests : BaseRepositoryTests
     {
@@ -14,7 +14,7 @@ namespace Recrut.Tests.Repositories
 
         #region Test Data
 
-        private User CreateUserWithRoles(string suffix = "", string[] roleNames = null)
+        private User CreateUserWithRoles(string suffix = "", string[]? roleNames = null)
         {
             var user = new User
             {
@@ -67,7 +67,7 @@ namespace Recrut.Tests.Repositories
         {
             // Arrange
             SeedDefaultRoles();
-            var user = CreateUserWithRoles("1", new[] { "Admin", "User" });
+            var user = CreateUserWithRoles("1", ["Admin", "User"]);
             _context.Users.Add(user);
             SaveChangesAndDetachAll();
 
@@ -104,7 +104,7 @@ namespace Recrut.Tests.Repositories
         {
             // Arrange
             SeedDefaultRoles();
-            var user = CreateUserWithRoles("1", new[] { "Admin" });
+            var user = CreateUserWithRoles("1", ["Admin"]);
             _context.Users.Add(user);
             SaveChangesAndDetachAll();
 
@@ -139,7 +139,7 @@ namespace Recrut.Tests.Repositories
         {
             // Arrange
             SeedDefaultRoles();
-            var user = CreateUserWithRoles("1", new[] { "Admin", "User" });
+            var user = CreateUserWithRoles("1", ["Admin", "User"]);
             _context.Users.Add(user);
             SaveChangesAndDetachAll();
 

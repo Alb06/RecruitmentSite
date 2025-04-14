@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Recrut.Data;
 using System.Data.Common;
 
-namespace Recrut.Tests.Repositories
+namespace Recrut.TestU.Repositories
 {
     /// <summary>
     /// Classe de base pour les tests de repository
@@ -33,10 +33,7 @@ namespace Recrut.Tests.Repositories
         /// <summary>
         /// Génère un ID unique pour les tests
         /// </summary>
-        protected int GenerateUniqueId()
-        {
-            return Math.Abs(Guid.NewGuid().GetHashCode() % 1000000);
-        }
+        protected static int GenerateUniqueId() => Math.Abs(Guid.NewGuid().GetHashCode() % 1000000);
 
         /// <summary>
         /// Sauvegarde les modifications dans le contexte et détache les entités
@@ -61,6 +58,7 @@ namespace Recrut.Tests.Repositories
             _context.Database.EnsureDeleted();
             _context.Dispose();
             _connection.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -1,6 +1,11 @@
 version: '3.8'
 
 services:
+  recrut.api:
+    # Other configurations...
+    volumes:
+      - dataprotection-keys:/app/keys
+
   postgres:
     image: postgres:latest
     container_name: postgres-dev
@@ -16,3 +21,4 @@ services:
 
 volumes:
   pgdata:
+  dataprotection-keys:

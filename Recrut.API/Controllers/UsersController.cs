@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Recrut.API.DTOs;
 using Recrut.Business.Services.Interfaces;
@@ -161,9 +162,9 @@ namespace Recrut.API.Controllers
                     return emailValidationResult;
             }
 
-            var (userValidationResult, existingUser) = await GetAndValidateUserAsync(id);
-            if (userValidationResult != null)
-                return userValidationResult;
+            var existingUser = await _userRepository.GetByIdAsync(id);
+            if (existingUser == null)
+                return NotFound(new OperationResult { Success = false, Message = "User not found." });
 
             _mapper.Map(userDto, existingUser);
 
@@ -263,7 +264,7 @@ namespace Recrut.API.Controllers
         /// </summary>
         /// <param name="email">Email to validate</param>
         /// <returns>BadRequest result if invalid, null if valid</returns>
-        private IActionResult ValidateEmail(string email)
+        private BadRequestObjectResult? ValidateEmail(string email)
         {
             if (!new EmailAddressAttribute().IsValid(email))
                 return BadRequest(new OperationResult { Success = false, Message = "Invalid email format." });
@@ -276,26 +277,12 @@ namespace Recrut.API.Controllers
         /// </summary>
         /// <param name="ids">Collection of IDs to validate</param>
         /// <returns>BadRequest result if invalid, null if valid</returns>
-        private IActionResult ValidateIds(IEnumerable<int> ids)
+        private BadRequestObjectResult? ValidateIds(IEnumerable<int> ids)
         {
             if (ids == null || !ids.Any())
                 return BadRequest(new OperationResult { Success = false, Message = "No Id was sent." });
 
             return null;
-        }
-
-        /// <summary>
-        /// Gets and validates that a user exists by ID
-        /// </summary>
-        /// <param name="id">User ID to check</param>
-        /// <returns>Tuple with validation result and user (if found)</returns>
-        private async Task<(IActionResult ValidationResult, User User)> GetAndValidateUserAsync(int id)
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
-                return (NotFound(new OperationResult { Success = false, Message = "User not found." }), null);
-
-            return (null, user);
         }
 
         #endregion

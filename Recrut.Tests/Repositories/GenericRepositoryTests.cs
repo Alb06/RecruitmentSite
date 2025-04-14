@@ -1,7 +1,7 @@
 ﻿using Recrut.Data.Repositories;
 using Recrut.Models;
 
-namespace Recrut.Tests.Repositories
+namespace Recrut.TestU.Repositories
 {
     public class GenericRepositoryTests : BaseRepositoryTests
     {
@@ -14,7 +14,7 @@ namespace Recrut.Tests.Repositories
 
         #region Test Data
 
-        private User CreateTestUser(string suffix = "")
+        private static User CreateTestUser(string suffix = "")
         {
             return new User
             {
@@ -195,6 +195,7 @@ namespace Recrut.Tests.Repositories
             SaveChangesAndDetachAll();
 
             var updatedUser = await _context.Users.FindAsync(user.Id);
+            Assert.NotNull(updatedUser);
             updatedUser.Name = "Updated Name";
             updatedUser.Email = "updated@example.com";
 

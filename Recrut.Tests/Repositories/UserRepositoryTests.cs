@@ -2,7 +2,7 @@
 using Recrut.Data.Repositories;
 using Recrut.Models;
 
-namespace Recrut.Tests.Repositories
+namespace Recrut.TestU.Repositories
 {
     public class UserRepositoryTests : BaseRepositoryTests
     {
@@ -15,7 +15,7 @@ namespace Recrut.Tests.Repositories
 
         #region Test Data
 
-        private User CreateTestUser(string suffix = "")
+        private static User CreateTestUser(string suffix = "")
         {
             return new User
             {

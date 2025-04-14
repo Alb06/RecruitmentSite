@@ -41,10 +41,9 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Configuration Autorisation
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
-});
+builder.Services.AddAuthorizationBuilder().AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+
+builder.Services.AddDockerSecurityConfiguration(builder.Environment, builder.Configuration);
 
 builder.Services.AddControllers();
 

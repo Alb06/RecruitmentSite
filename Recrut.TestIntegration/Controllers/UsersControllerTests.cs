@@ -9,29 +9,24 @@ namespace Recrut.API.IntegrationTests.Controllers
 {
     public class UsersControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
-        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        private string _adminToken;
+        private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+        private string _adminToken = string.Empty;
 
         public UsersControllerTests(CustomWebApplicationFactory<Program> factory)
         {
-            _factory = factory;
             _client = factory.CreateClient(new WebApplicationFactoryClientOptions
             {
                 AllowAutoRedirect = false
             });
 
-            // Nous allons obtenir un token d'authentification pour les tests qui en ont besoin
+            // We will get an authentication token for tests that need it
             SetupAdminAuthentication().Wait();
         }
 
         private async Task SetupAdminAuthentication()
         {
-            // Login pour obtenir un token
+            // Login to get a token
             var loginDto = new LoginDto
             {
                 Email = "admin@example.com",
@@ -44,7 +39,14 @@ namespace Recrut.API.IntegrationTests.Controllers
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<AuthResultDto>(content, _jsonOptions);
 
-            _adminToken = result.Token;
+            if (result != null)
+            {
+                _adminToken = result.Token;
+            }
+            else
+            {
+                throw new InvalidOperationException("Failed to deserialize authentication result");
+            }
         }
 
         private void AuthenticateClient()
@@ -115,8 +117,7 @@ namespace Recrut.API.IntegrationTests.Controllers
             AuthenticateClient();
             var newUsers = new List<UserCreateDto>
             {
-                new UserCreateDto
-                {
+                new() {
                     Name = "New Test User",
                     Email = "newuser@example.com",
                     PasswordHash = "Password123!"
@@ -182,8 +183,7 @@ namespace Recrut.API.IntegrationTests.Controllers
 
             var newUsers = new List<UserCreateDto>
             {
-                new UserCreateDto
-                {
+                new() {
                     Name = "User To Delete",
                     Email = email,
                     PasswordHash = "Password123!"
@@ -216,14 +216,12 @@ namespace Recrut.API.IntegrationTests.Controllers
 
             var newUsers = new List<UserCreateDto>
             {
-                new UserCreateDto
-                {
+                new() {
                     Name = "User To Delete 1",
                     Email = "todelete1@example.com",
                     PasswordHash = "Password123!"
                 },
-                new UserCreateDto
-                {
+                new() {
                     Name = "User To Delete 2",
                     Email = "todelete2@example.com",
                     PasswordHash = "Password123!"
@@ -241,6 +239,8 @@ namespace Recrut.API.IntegrationTests.Controllers
             var content2 = await response2.Content.ReadAsStringAsync();
             var user2 = JsonSerializer.Deserialize<UserResponseDto>(content2, _jsonOptions);
 
+            Assert.NotNull(user1);
+            Assert.NotNull(user2);
             var ids = new List<int> { user1.Id, user2.Id };
 
             // Act

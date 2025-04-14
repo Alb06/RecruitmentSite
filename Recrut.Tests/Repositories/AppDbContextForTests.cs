@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Recrut.Data;
-using Recrut.Models;
 
-namespace Recrut.Tests.Repositories
+namespace Recrut.TestU.Repositories
 {
     /// <summary>
     /// Cette classe étend AppDbContext pour adapter son comportement aux tests

@@ -37,7 +37,7 @@ namespace Recrut.API.IntegrationTests
         /// <summary>
         /// Désérialise le contenu d'une réponse HTTP en un objet du type spécifié
         /// </summary>
-        public static async Task<T> ReadFromJsonAsync<T>(this HttpContent content)
+        public static async Task<T?> ReadFromJsonAsync<T>(this HttpContent content)
         {
             var stringContent = await content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<T>(stringContent, JsonOptions);

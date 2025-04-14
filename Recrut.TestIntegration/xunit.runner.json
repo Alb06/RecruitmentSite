@@ -1,4 +1,6 @@
 {
   "$schema": "https://xunit.net/schema/current/xunit.runner.schema.json",
-  "shadowCopy": false
+  "shadowCopy": false,
+  "diagnosticMessages": true,
+  "preEnumerateTheories": true
 }

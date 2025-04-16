@@ -1,38 +1,25 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-
-interface WeatherForecast {
-  date: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
-}
+import { Component } from '@angular/core';
+/*import { NavigationEnd, Router } from '@angular/router';*/
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  standalone: false,
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  standalone: false
 })
-export class AppComponent implements OnInit {
-  public forecasts: WeatherForecast[] = [];
-
-  constructor(private http: HttpClient) {}
-
+export class AppComponent {
   ngOnInit() {
-    this.getForecasts();
+      throw new Error('Method not implemented.');
   }
-
-  getForecasts() {
-    this.http.get<WeatherForecast[]>('/weatherforecast').subscribe(
-      (result) => {
-        this.forecasts = result;
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
+  forecasts(forecasts: any) {
+      throw new Error('Method not implemented.');
   }
-
   title = 'recrut.appliweb.client';
+  //constructor(private router: Router) {
+  //  router.events.subscribe(event => {
+  //    if (event instanceof NavigationEnd) {
+  //      console.log('Route actuelle:', event.url);
+  //    }
+  //  });
+  //}
 }

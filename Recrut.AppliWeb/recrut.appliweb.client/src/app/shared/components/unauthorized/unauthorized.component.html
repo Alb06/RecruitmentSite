@@ -1,0 +1,22 @@
+<div class="unauthorized-container">
+  <div class="card">
+    <div class="card-body text-center">
+      <h1 class="card-title text-danger mb-4">Accès Non Autorisé</h1>
+      <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Vous n'avez pas les droits nécessaires pour accéder à cette page.
+      </div>
+      <p class="mt-4">
+        Veuillez contacter votre administrateur si vous pensez que vous devriez avoir accès à cette ressource.
+      </p>
+      <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-outline-secondary me-2" (click)="goBack()">
+          <i class="bi bi-arrow-left me-1"></i> Retour
+        </button>
+        <button class="btn btn-primary" (click)="goHome()">
+          <i class="bi bi-house-door me-1"></i> Accueil
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

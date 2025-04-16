@@ -1,0 +1,55 @@
+<div class="login-container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-title text-center">Connexion</h4>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+        <!-- Message d'erreur -->
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email"
+                 formControlName="email"
+                 class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && f['email'].errors }"
+                 id="email"
+                 placeholder="Votre email" />
+          <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+            <div *ngIf="f['email'].errors['required']">L'email est requis</div>
+            <div *ngIf="f['email'].errors['email']">Veuillez saisir un email valide</div>
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="mb-3">
+          <label for="password" class="form-label">Mot de passe</label>
+          <input type="password"
+                 formControlName="password"
+                 class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
+                 id="password"
+                 placeholder="Votre mot de passe" />
+          <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+            <div *ngIf="f['password'].errors['required']">Le mot de passe est requis</div>
+            <div *ngIf="f['password'].errors['minlength']">Le mot de passe doit contenir au moins 6 caractères</div>
+          </div>
+        </div>
+
+        <!-- Bouton de soumission -->
+        <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+          Se connecter
+        </button>
+
+        <!-- Lien vers la page d'inscription -->
+        <div class="text-center mt-3">
+          <p>Pas encore de compte ? <a routerLink="/register">S'inscrire</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

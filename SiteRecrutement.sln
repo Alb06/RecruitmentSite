@@ -19,7 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recrut.TestU", "Recrut.Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5E4730EB-0BCC-4B33-BD5A-BEA9CBB1B746}"
 	ProjectSection(SolutionItems) = preProject
-		.runsettings = .runsettings
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
@@ -30,11 +29,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{D812
 		scripts\Run-Coverage.ps1 = scripts\Run-Coverage.ps1
 		scripts\run-coverage.sh = scripts\run-coverage.sh
 		scripts\sync_issues.py = scripts\sync_issues.py
+		scripts\test-bff-connectivity.js = scripts\test-bff-connectivity.js
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recrut.API.IntegrationTests", "Recrut.TestIntegration\Recrut.API.IntegrationTests.csproj", "{D5B39B36-8E82-435F-9AA0-743C5BA822EE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{08307455-0FA4-4A18-9242-56D5B3769D06}"
+	ProjectSection(SolutionItems) = preProject
+		.runsettings = .runsettings
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

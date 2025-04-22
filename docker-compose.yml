@@ -2,9 +2,37 @@ version: '3.8'
 
 services:
   recrut.api:
-    # Other configurations...
+    build:
+      context: .
+      dockerfile: Recrut.API/Dockerfile
+    container_name: recrut-api
+    ports:
+      - "5183:8080"
+    depends_on:
+      - postgres
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - UseDataProtectionCertificate=false
     volumes:
       - dataprotection-keys:/app/keys
+    networks:
+      - recrut-network
+
+  recrut.appliweb.server:
+    build:
+      context: .
+      dockerfile: Recrut.AppliWeb/Recrut.AppliWeb.Server/Dockerfile
+    container_name: recrut-bff
+    ports:
+      - "5209:8080"
+    depends_on:
+      - postgres
+      - recrut.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ApiSettings__BaseUrl=http://recrut-api:8080  # Communication par nom de service
+    networks:
+      - recrut-network 
 
   postgres:
     image: postgres:latest
@@ -18,6 +46,13 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/docker/volumes/pgdata/_data
+    networks:
+      - recrut-network
+
+
+networks:
+  recrut-network:
+    driver: bridge
 
 volumes:
   pgdata:

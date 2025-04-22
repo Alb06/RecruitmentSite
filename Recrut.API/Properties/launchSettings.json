@@ -17,8 +17,10 @@
       "environmentVariables": {
         "ASPNETCORE_HTTP_PORTS": "8080"
       },
-      "publishAllPorts": true,
-      "useSSL": false
+      "publishAllPorts": false,
+      "useSSL": false,
+      "httpPort": 5183,
+      "sslPort": 5184
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json"

@@ -46,6 +46,6 @@ WORKDIR /app
 EXPOSE 8080
 RUN mkdir -p /app/keys && chmod 700 /app/keys
 RUN mkdir -p /app/certificates
-COPY ["certificates/dataprotection.pfx", "/app/certificates/"]
+COPY certificates/dataprotection.pfx* /app/certificates/ 2>/dev/null || echo "Certificat non trouvé, ce sera ignoré en développement"
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Recrut.API.dll"]

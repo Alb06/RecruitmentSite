@@ -38,12 +38,25 @@ namespace Recrut.Data.Repositories
 
         public async Task CreateAsync(IEnumerable<T> entities)
         {
+            foreach (var entity in entities)
+            {
+                if (entity is IAuditable auditableEntity && auditableEntity.CreatedAt == default)
+                {
+                    auditableEntity.CreatedAt = DateTime.UtcNow;
+                }
+            }
+
             await _dbSet.AddRangeAsync(entities);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(T entity)
         {
+            if (entity is IAuditable auditableEntity)
+            {
+                auditableEntity.UpdatedAt = DateTime.UtcNow;
+            }
+
             _dbSet.Update(entity);
             await _context.SaveChangesAsync();
         }

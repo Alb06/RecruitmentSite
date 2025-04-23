@@ -254,5 +254,31 @@ namespace Recrut.TestU.Repositories
             var remainingUser = await _context.Users.FindAsync(users[2].Id);
             Assert.NotNull(remainingUser);
         }
+
+        [Fact]
+        public async Task UpdateAsync_WithAuditableEntity_ShouldUpdateUpdatedAtField()
+        {
+            // Arrange
+            var user = CreateTestUser();
+            _context.Users.Add(user);
+            SaveChangesAndDetachAll();
+
+            // Initial state - UpdatedAt should be null
+            var initialUser = await _repository.GetByIdAsync(user.Id);
+            Assert.Null(initialUser.UpdatedAt);
+
+            // Act - Update the user
+            initialUser.Name = "Updated Name";
+            await _repository.UpdateAsync(initialUser);
+
+            // Assert - UpdatedAt should be set
+            var updatedUser = await _repository.GetByIdAsync(user.Id);
+            Assert.NotNull(updatedUser.UpdatedAt);
+            Assert.Equal("Updated Name", updatedUser.Name);
+
+            // Verify it's recent (within the last 5 seconds)
+            var timeDifference = DateTime.UtcNow - updatedUser.UpdatedAt.Value;
+            Assert.True(timeDifference.TotalSeconds < 5);
+        }
     }
 }

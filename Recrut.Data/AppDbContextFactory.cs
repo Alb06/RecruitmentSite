@@ -10,7 +10,8 @@ namespace Recrut.Data
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
             // Remplacez la chaîne de connexion par la vôtre.
-            optionsBuilder.UseNpgsql("Host=host.docker.internal;Port=5432;Database=recrutdb;Username=zahagadmin;Password=24rnUZ42");
+            //optionsBuilder.UseNpgsql("Host=host.docker.internal;Port=5432;Database=recrutdb;Username=zahagadmin;Password=24rnUZ42");
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=recrutdb;Username=zahagadmin;Password=24rnUZ42");
 
             return new AppDbContext(optionsBuilder.Options);
         }

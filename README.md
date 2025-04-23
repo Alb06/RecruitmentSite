@@ -1,93 +1,82 @@
-# RecruitmentSite
+# Ajout de fonctionnalités d'audit aux entités
 
+## Comment implémenter l'interface IAuditable dans une nouvelle entité
 
+Pour ajouter les fonctionnalités d'audit (suivi des dates de création et de modification) à une nouvelle entité, suivez ces étapes :
 
-## Getting started
+1. Assurez-vous que votre classe implémente l'interface `IAuditable` :
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+```csharp
+using Recrut.Models.Interfaces;
+using System;
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
+namespace Recrut.Models
+{
+    public class NouvelleEntite : IEntity, IAuditable
+    {
+        // Propriétés de l'entité...
+        public int Id { get; set; }
+        public required string Attribut1 { get; set; }
+        public required string Attribut2 { get; set; }
+        
+        // Propriétés d'audit requises par l'interface IAuditable
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+    }
+}
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/dev1338/recruitmentsite.git
-git branch -M main
-git push -uf origin main
+
+2. Ajoutez la configuration dans la méthode `OnModelCreating` de `AppDbContext` (facultatif, mais recommandé) :
+
+```csharp
+// Dans la méthode OnModelCreating de AppDbContext
+modelBuilder.Entity<NouvelleEntite>()
+    .Property(e => e.CreatedAt)
+    .HasColumnType("timestamp with time zone")
+    .IsRequired();
+    
+modelBuilder.Entity<NouvelleEntite>()
+    .Property(e => e.UpdatedAt)
+    .HasColumnType("timestamp with time zone")
+    .IsRequired(false);
 ```
 
-## Integrate with your tools
+3. Créez une migration pour ajouter la nouvelle entité à la base de données :
 
-- [ ] [Set up project integrations](https://gitlab.com/dev1338/recruitmentsite/-/settings/integrations)
+```bash
+dotnet ef migrations add AddNouvelleEntite -p Recrut.Data -s Recrut.Data
+dotnet ef database update -p Recrut.Data -s Recrut.Data
+```
 
-## Collaborate with your team
+## Comportement attendu
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+- Lorsqu'une entité est créée, la propriété `CreatedAt` est automatiquement initialisée avec la date et l'heure actuelles en UTC
+- Lorsqu'une entité est modifiée via la méthode `UpdateAsync` du repository, la propriété `UpdatedAt` est automatiquement mise à jour avec la date et l'heure actuelles en UTC
+- Ces informations sont persistées dans la base de données et peuvent être utilisées pour l'audit et le suivi des modifications
 
-## Test and Deploy
+# Suppression de migrations Entity Framework Core
 
-Use the built-in continuous integration in GitLab.
+## Migration créée mais pas appliquée
+Pour supprimer un fichier de migration non appliqué :
+```bash
+dotnet ef migrations remove -p Recrut.Data -s Recrut.Data
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Migration déjà appliquée en base
+Deux étapes sont nécessaires :
 
-***
+1. Revenir à la migration précédente en base de données :
+```bash
+dotnet ef database update NomDeLaMigrationPrécédente -p Recrut.Data -s Recrut.Data
+```
+ou pour revenir avant toute migration :
+```bash
+dotnet ef database update 0 -p Recrut.Data -s Recrut.Data
+```
 
-# Editing this README
+2. Supprimer le fichier de migration :
+```bash
+dotnet ef migrations remove -p Recrut.Data -s Recrut.Data
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Ces commandes restaureront votre base de données et supprimeront les fichiers de migration correspondants.

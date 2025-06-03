@@ -36,8 +36,17 @@ namespace Recrut.API.Configuration
                 {
                     try
                     {
+                        var certificatePassword = configuration["CertificatePassword"];
+
+                        if (string.IsNullOrEmpty(certificatePassword))
+                        {
+                            Console.WriteLine("⚠️ WARNING: Certificate password not configured. " +
+                                            "Configure 'CertificatePassword' via User Secrets or environment variables.");
+                            return;
+                        }
+
                         dataProtectionBuilder.ProtectKeysWithCertificate(
-                            new X509Certificate2(certPath, "S3ceBexXOsRCcLnIbwMA9pvP5KiMI02tcwZ1Kqvp"));
+                            new X509Certificate2(certPath, certificatePassword));
                         Console.WriteLine("Certificate key protection enabled");
                     }
                     catch (Exception ex)

@@ -13,6 +13,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - UseDataProtectionCertificate=false
+      - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTION_STRING}
+      - Jwt__Secret=${JWT_SECRET}
+      - Database__Username=${POSTGRES_USER}
+      - Database__Password=${POSTGRES_PASSWORD}
+      - Database__DatabaseName=${POSTGRES_DB}
     volumes:
       - dataprotection-keys:/app/keys
     networks:
@@ -39,9 +44,9 @@ services:
     container_name: postgres-dev
     restart: always
     environment:
-      POSTGRES_USER: zahagadmin
-      POSTGRES_PASSWORD: 24rnUZ42
-      POSTGRES_DB: recrutdb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:

@@ -140,8 +140,8 @@ docker-compose ps
 ```bash
 # 1. Base de données
 docker run -d --name postgres-dev \
-  -e POSTGRES_USER=zahagadmin \
-  -e POSTGRES_PASSWORD=24rnUZ42 \
+  -e POSTGRES_USER=user_secret \
+  -e POSTGRES_PASSWORD=user_secret \
   -e POSTGRES_DB=recrutdb \
   -p 5432:5432 postgres:latest
 
@@ -352,7 +352,7 @@ Le projet actuel est déjà structuré pour faciliter l'extraction en microservi
     "ExpiryMinutes": 60
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=recrutdb;Username=zahagadmin;Password=***"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=recrutdb;Username=***;Password=***"
   }
 }
 ```

@@ -8,7 +8,7 @@ using System.Text;
 var builder = WebApplication.CreateSlimBuilder(args);
 
 // Ajout des configurations
-builder.Services.AddDatabaseConfiguration();
+builder.Services.AddDatabaseConfiguration(builder.Configuration);
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);

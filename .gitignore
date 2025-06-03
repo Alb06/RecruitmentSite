@@ -3,6 +3,33 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Configuration files with credentials
+.env
+.env.local
+.env.development
+.env.production
+*.env
+
+# User Secrets
+secrets.json
+
+# Certificats and keys
+*.pfx
+*.p12
+*.key
+*.pem
+*.crt
+certificates/
+
+# Data Bases
+*.db
+*.sqlite
+*.sqlite3
+
+# Local IDE setup with potential credentials
+.vscode/settings.json
+.idea/
+
 # User-specific files
 *.rsuser
 *.suo

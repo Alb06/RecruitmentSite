@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 
 namespace Recrut.Data
 {
@@ -28,9 +29,11 @@ namespace Recrut.Data
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                connectionString = "Host=localhost;Port=5432;Database=recrutdb;Username=postgres;Password=admin";
-                Console.WriteLine("⚠️ CAUTION: Using the default connection string. " +
-                                "Configure User Secrets for security !");
+                //connectionString = "Host=localhost;Port=5432;Database=recrutdb;Username=postgres;Password=admin";
+                //Console.WriteLine("⚠️ CAUTION: Using the default connection string. " +
+                //                "Configure User Secrets for security !");
+                Console.WriteLine("⚠️ CAUTION: connection string is empty !");
+                throw new NoNullAllowedException("⚠️ CAUTION: connection string is empty !");
             }
 
             optionsBuilder.UseNpgsql(connectionString);

@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Recrut.API\Recrut.API.csproj" />
     <ProjectReference Include="..\Recrut.Business\Recrut.Business.csproj" />
   </ItemGroup>
 

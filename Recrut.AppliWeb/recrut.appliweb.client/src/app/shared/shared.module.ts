@@ -4,12 +4,11 @@ import { RouterModule } from '@angular/router';
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 
 @NgModule({
-  declarations: [
-    UnauthorizedComponent
-  ],
+  declarations: [ ],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    UnauthorizedComponent
   ],
   exports: [
     UnauthorizedComponent

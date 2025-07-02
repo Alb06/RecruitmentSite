@@ -53,6 +53,7 @@ var app = builder.Build();
 app.UseSwaggerConfiguration();
 app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<DatabaseConnectionMiddleware>();
 
 // Activation de l'authentification et de l'autorisation
 app.UseAuthentication();

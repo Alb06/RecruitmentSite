@@ -2,7 +2,6 @@
 using Recrut.API.DTOs;
 using System.Net;
 using System.Text.Json;
-using Xunit;
 
 namespace Recrut.API.IntegrationTests.Controllers
 {

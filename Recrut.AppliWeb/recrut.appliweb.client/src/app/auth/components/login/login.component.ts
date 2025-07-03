@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs/operators';
@@ -16,7 +16,9 @@ import { CommonModule } from '@angular/common';
     CommonModule
   ]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterViewInit {
+  @ViewChild('emailInput') emailInput!: ElementRef;
+
   loginForm!: FormGroup;
   loading = false;
   submitted = false;
@@ -31,34 +33,36 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Initialiser le formulaire avec validation
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
 
-    // Récupérer l'URL de retour des paramètres de route ou utiliser la page d'accueil
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 
-    // Rediriger si déjà connecté
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);
     }
   }
 
-  // Getter pour accéder facilement aux champs du formulaire
+  ngAfterViewInit(): void {
+    if (this.error && this.emailInput) {
+      this.emailInput.nativeElement.focus();
+    }
+  }
+
   get f() { return this.loginForm.controls; }
 
   onSubmit(): void {
     this.submitted = true;
+    this.error = '';
 
-    // Arrêter si le formulaire est invalide
     if (this.loginForm.invalid) {
+      this.focusFirstErrorField();
       return;
     }
 
     this.loading = true;
-    this.error = '';
 
     this.authService.login({
       email: this.f['email'].value,
@@ -71,7 +75,17 @@ export class LoginComponent implements OnInit {
       },
       error: error => {
         this.error = error.message || 'Échec de connexion. Vérifiez vos identifiants.';
+        this.focusFirstErrorField();
       }
     });
+  }
+
+  private focusFirstErrorField(): void {
+    setTimeout(() => {
+      const firstErrorField = document.querySelector('.form-control--invalid') as HTMLElement;
+      if (firstErrorField) {
+        firstErrorField.focus();
+      }
+    }, 100);
   }
 }

@@ -22,6 +22,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4); /* ✅ MODIFICATION : Ajout espacement entre champs */
 }
 
 .form-label {
@@ -96,4 +97,21 @@
   font-size: var(--font-size-sm);
   color: var(--color-gray-600);
   margin-top: var(--spacing-1);
+}
+
+/* === MESSAGES DE VALIDATION === */
+.validation-message {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-1); /* ✅ MODIFICATION : Réduit de var(--spacing-2) à var(--spacing-1) */
+}
+
+.validation-message--error {
+  color: var(--color-error);
+}
+
+.validation-message--success {
+  color: var(--color-success);
 }

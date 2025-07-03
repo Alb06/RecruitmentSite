@@ -1,0 +1,99 @@
+/* === CONTENEURS DE FORMULAIRES === */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  max-width: var(--width-md);
+  margin: 0 auto;
+  padding: var(--spacing-8);
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-4);
+}
+
+/* === CHAMPS DE FORMULAIRE === */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+  margin-bottom: var(--spacing-1);
+}
+
+.form-label--required::after {
+  content: " *";
+  color: var(--color-error);
+}
+
+/* === CONTROLES DE FORMULAIRE === */
+.form-control {
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-sans);
+  line-height: var(--line-height-normal);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  background-color: var(--color-white);
+}
+
+.form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+.form-control:disabled {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-500);
+  cursor: not-allowed;
+}
+
+/* États de validation */
+.form-control--valid {
+  border-color: var(--color-success);
+}
+
+.form-control--valid:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.form-control--invalid {
+  border-color: var(--color-error);
+}
+
+.form-control--invalid:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* === GROUPES DE CHAMPS === */
+.form-group {
+  position: relative;
+  margin-bottom: var(--spacing-4);
+}
+
+.form-group--inline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+/* === MESSAGES D'AIDE === */
+.form-help {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin-top: var(--spacing-1);
+}

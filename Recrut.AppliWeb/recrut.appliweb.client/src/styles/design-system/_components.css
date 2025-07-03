@@ -1,0 +1,135 @@
+/* === SYSTÈME D'ALERTES === */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border: 1px solid;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--spacing-4);
+}
+
+.alert--success {
+  color: #065f46;
+  background-color: var(--color-success-light);
+  border-color: var(--color-success);
+}
+
+.alert--error {
+  color: #991b1b;
+  background-color: var(--color-error-light);
+  border-color: var(--color-error);
+}
+
+.alert--warning {
+  color: #92400e;
+  background-color: var(--color-warning-light);
+  border-color: var(--color-warning);
+}
+
+.alert--info {
+  color: #0c4a6e;
+  background-color: var(--color-info-light);
+  border-color: var(--color-info);
+}
+
+/* Icônes d'alerte */
+.alert__icon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.125rem;
+}
+
+/* === MESSAGES DE VALIDATION === */
+.validation-message {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-2);
+}
+
+.validation-message--error {
+  color: var(--color-error);
+}
+
+.validation-message--success {
+  color: var(--color-success);
+}
+
+/* === BOUTONS === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family-sans);
+  line-height: var(--line-height-tight);
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Variantes de boutons */
+.btn--primary {
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  color: var(--color-gray-700);
+  background-color: var(--color-gray-100);
+  border-color: var(--color-gray-300);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-gray-200);
+  border-color: var(--color-gray-400);
+}
+
+.btn--outline {
+  color: var(--color-primary);
+  background-color: transparent;
+  border-color: var(--color-primary);
+}
+
+.btn--outline:hover:not(:disabled) {
+  color: var(--color-white);
+  background-color: var(--color-primary);
+}
+
+/* Tailles de boutons */
+.btn--sm {
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
+}
+
+.btn--lg {
+  padding: var(--spacing-4) var(--spacing-8);
+  font-size: var(--font-size-lg);
+}
+
+.btn--full {
+  width: 100%;
+}

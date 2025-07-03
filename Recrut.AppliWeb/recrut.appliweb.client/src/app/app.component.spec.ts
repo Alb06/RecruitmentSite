@@ -1,39 +1,32 @@
-import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AppComponent } from './app.component';
-import { provideRouter, RouterOutlet } from '@angular/router';
 
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
-  let httpMock: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        AppComponent,
-        RouterOutlet
-      ],
+      imports: [AppComponent],
       providers: [
+        provideRouter([]),
         provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([])
-      ],
+        provideHttpClientTesting()
+      ]
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
-    httpMock = TestBed.inject(HttpTestingController);
-  });
-
-  afterEach(() => {
-    httpMock.verify();
   });
 
   it('should create the app', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should have title', () => {
+    expect(component.title).toEqual('recrut.appliweb.client');
   });
 });

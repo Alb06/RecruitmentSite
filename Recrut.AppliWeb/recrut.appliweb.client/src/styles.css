@@ -1,5 +1,5 @@
 /* Styles globaux de l'application */
-@import 'design-system/index.css';
+@import 'styles/design-system/index.css';
 
 /* Styles spécifiques à l'application (si nécessaire) */
 /* Ici vous pouvez ajouter des styles qui override le design system */

@@ -1,55 +1,80 @@
-<div class="login-container">
-  <div class="card">
-    <div class="card-header">
-      <h4 class="card-title text-center">Connexion</h4>
-    </div>
-    <div class="card-body">
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+<div class="flex items-center justify-center" style="min-height: 80vh;">
+  <div class="form-container">
+    <h2 class="text-center mb-6">Connexion</h2>
 
-        <!-- Message d'erreur -->
-        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+      <!-- Message d'erreur global -->
+      <div *ngIf="error" class="alert alert--error" role="alert" aria-live="polite">
+        <span class="alert__icon" aria-hidden="true">⚠️</span>
+        {{error}}
+      </div>
 
-        <!-- Email -->
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email"
-                 formControlName="email"
-                 class="form-control"
-                 [ngClass]="{ 'is-invalid': submitted && f['email'].errors }"
-                 id="email"
-                 placeholder="Votre email" />
-          <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
-            <div *ngIf="f['email'].errors['required']">L'email est requis</div>
-            <div *ngIf="f['email'].errors['email']">Veuillez saisir un email valide</div>
-          </div>
+      <!-- Champ Email -->
+      <div class="form-field">
+        <label for="email" class="form-label form-label--required">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.form-control--invalid]="submitted && f['email'].errors"
+          [class.form-control--valid]="submitted && !f['email'].errors && f['email'].value"
+          placeholder="Votre email"
+          aria-describedby="email-error"
+          [attr.aria-invalid]="submitted && f['email'].errors ? 'true' : 'false'" />
+
+        <div *ngIf="submitted && f['email'].errors"
+             class="validation-message validation-message--error"
+             id="email-error"
+             role="alert">
+          <span aria-hidden="true">✕</span>
+          <div *ngIf="f['email'].errors['required']">L'email est requis</div>
+          <div *ngIf="f['email'].errors['email']">Veuillez saisir un email valide</div>
         </div>
+      </div>
 
-        <!-- Mot de passe -->
-        <div class="mb-3">
-          <label for="password" class="form-label">Mot de passe</label>
-          <input type="password"
-                 formControlName="password"
-                 class="form-control"
-                 [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
-                 id="password"
-                 placeholder="Votre mot de passe" />
-          <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
-            <div *ngIf="f['password'].errors['required']">Le mot de passe est requis</div>
-            <div *ngIf="f['password'].errors['minlength']">Le mot de passe doit contenir au moins 6 caractères</div>
-          </div>
+      <!-- Champ Mot de passe -->
+      <div class="form-field">
+        <label for="password" class="form-label form-label--required">Mot de passe</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.form-control--invalid]="submitted && f['password'].errors"
+          [class.form-control--valid]="submitted && !f['password'].errors && f['password'].value"
+          placeholder="Votre mot de passe"
+          aria-describedby="password-error"
+          [attr.aria-invalid]="submitted && f['password'].errors ? 'true' : 'false'" />
+
+        <div *ngIf="submitted && f['password'].errors"
+             class="validation-message validation-message--error"
+             id="password-error"
+             role="alert">
+          <span aria-hidden="true">✕</span>
+          <div *ngIf="f['password'].errors['required']">Le mot de passe est requis</div>
+          <div *ngIf="f['password'].errors['minlength']">Le mot de passe doit contenir au moins 6 caractères</div>
         </div>
+      </div>
 
-        <!-- Bouton de soumission -->
-        <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
-          Se connecter
-        </button>
+      <!-- Bouton de soumission -->
+      <button
+        type="submit"
+        class="btn btn--primary btn--full"
+        [disabled]="loading"
+        [attr.aria-describedby]="loading ? 'loading-text' : null">
+        <span *ngIf="loading" class="spinner" aria-hidden="true"></span>
+        Se connecter
+      </button>
+      <div *ngIf="loading" id="loading-text" class="sr-only">Connexion en cours...</div>
 
-        <!-- Lien vers la page d'inscription -->
-        <div class="text-center mt-3">
-          <p>Pas encore de compte ? <a routerLink="/register">S'inscrire</a></p>
-        </div>
-      </form>
-    </div>
+      <!-- Lien vers inscription -->
+      <div class="text-center mt-4">
+        <p class="text-muted">
+          Pas encore de compte ?
+          <a routerLink="/register" class="text-primary">S'inscrire</a>
+        </p>
+      </div>
+    </form>
   </div>
 </div>
